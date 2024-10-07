@@ -20,28 +20,28 @@ main_button.onclick = () => {
   rescueTurtle(rescue_per_click);
 };
 
+// Makes the spacing look correct on the webpage.
+const main_auto_button_separator = document.createElement("div")
+main_auto_button_separator.innerHTML = "Press the turtle button above to rescue turtles!"
 // UPGRADE AUTO BUTTON SETUP
-const upgrade_auto_button = document.createElement("button")
-const upgrade_auto_text = "Click me to train turtle rescue squads! (Cost: 10 Turtles)"
-upgrade_auto_button.innerHTML = upgrade_auto_text
+const upgrade_auto_button = document.createElement("button");
+const upgrade_auto_text =
+  "Click me to train turtle rescue squads! (Cost: 10 Turtles)";
+upgrade_auto_button.innerHTML = upgrade_auto_text;
 // Button is disabled at start.
 upgrade_auto_button.disabled = true;
 
-
 // Will change if I plan to scale
-const upgrade_auto_cost : number = 10
-upgrade_auto_button.onclick = () => 
-    {
-        if(total_turtles >= upgrade_auto_cost)
-            {
-                // Rescuing negative turtles "spends" them on an
-                // upgrade.
-                rescueTurtle(-upgrade_auto_cost)
-                // Upgrade the amount of turtles rescued every second
-                rescue_per_auto += 1;
-            }
-        
-    }
+const upgrade_auto_cost: number = 10;
+upgrade_auto_button.onclick = () => {
+  if (total_turtles >= upgrade_auto_cost) {
+    // Rescuing negative turtles "spends" them on an
+    // upgrade.
+    rescueTurtle(-upgrade_auto_cost);
+    // Upgrade the amount of turtles rescued every second
+    rescue_per_auto += 1;
+  }
+};
 
 // Start the auto-click
 requestAnimationFrame(autoTurtle);
@@ -51,14 +51,11 @@ appendToApp();
 
 function rescueTurtle(turts_to_rescue: number) {
   total_turtles += turts_to_rescue;
-  if(total_turtles < upgrade_auto_cost)
-    {
-        upgrade_auto_button.disabled = true;
-    }
-  else if (upgrade_auto_button.disabled)
-    {
-        upgrade_auto_button.disabled = false;
-    }
+  if (total_turtles < upgrade_auto_cost) {
+    upgrade_auto_button.disabled = true;
+  } else if (upgrade_auto_button.disabled) {
+    upgrade_auto_button.disabled = false;
+  }
   main_amount_label.innerHTML = `${total_turtles} turtles rescued.`;
 }
 
@@ -84,7 +81,8 @@ function autoTurtle(timestamp: number) {
 }
 function appendToApp() {
   app.append(header);
-  app.append(main_button);
-  app.append(upgrade_auto_button);
   app.append(main_amount_label);
+  app.append(main_button);
+  app.append(main_auto_button_separator)
+  app.append(upgrade_auto_button);
 }
