@@ -1,3 +1,4 @@
+// Found the toPrecision() function on mdn web docs when looking at the Number methods
 import "./style.css";
 
 const app: HTMLDivElement = document.querySelector("#app")!;
@@ -7,6 +8,8 @@ const header = document.createElement("h1");
 header.innerHTML = gameName;
 document.title = gameName;
 
+// What level of rounding is used when displaying numbers
+const PRECISION = 2
 
 // MAIN BUTTON SETUP
 const main_button = document.createElement("button");
@@ -55,83 +58,90 @@ main_auto_button_separator.innerHTML =
   "Press the turtle button above to rescue turtles!";
 
 
+
+// Upgrades-------------------------------------------------------- 
+
+// Price Increase
+// Every time an item is bought, the price for that item will be multiplied by 1.15
+const PRICE_INCREASE : number = 1.15
+
+
 // Upgrade A (cost 10, profit 0.1/sec)
-const upgrade_A_cost: number = 10;
+let upgrade_A_cost: number = 10;
 const upgrade_A_profit: number = 0.1;
 const upgrade_A_button = document.createElement("button");
-const upgrade_A_text =
-  `A: (Cost ${upgrade_A_cost}. Growth Rate: ${upgrade_A_profit}/sec)`;
+const upgrade_A_text = `A: (Cost ${upgrade_A_cost}. Growth Rate: ${upgrade_A_profit}/sec)`;
 upgrade_A_button.innerHTML = upgrade_A_text;
 // Button is disabled at start.
 upgrade_A_button.disabled = true;
 
-let upgrade_A_count : number = 0;
+let upgrade_A_count: number = 0;
 //TODO: Round to nearist hundredth
 upgrade_A_button.onclick = () => {
   if (total_turtles >= upgrade_A_cost) {
-    // Rescuing negative turtles "spends" them on an
-    // upgrade.
-    rescueTurtle(-upgrade_A_cost);
-    // Upgrade the amount of turtles rescued every second
-    rescue_per_auto += upgrade_A_profit;
-    // Increment the number of upgrades
     upgrade_A_count += 1;
-    // Update text for growth and upgrades
-    update_upgrade_text();
+    // Cost is assigned to the new price calculated in the upgrade function
+    upgrade_A_cost = buy_upgrade(upgrade_A_cost, upgrade_A_profit)
+    // Update text after price increase
+    upgrade_A_button.innerHTML = `C: (Cost ${upgrade_A_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_A_profit.toFixed(PRECISION)}/sec)`;
   }
 };
 
 // Upgrade B (cost 100, profit 2.0/sec)
-const upgrade_B_cost: number = 100;
+let upgrade_B_cost: number = 100;
 const upgrade_B_profit: number = 2.0;
 const upgrade_B_button = document.createElement("button");
-const upgrade_B_text =
-  `B: (Cost ${upgrade_B_cost}. Growth Rate: ${upgrade_B_profit}/sec)`;
+const upgrade_B_text = `B: (Cost ${upgrade_B_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_B_profit.toFixed(PRECISION)}/sec)`;
 upgrade_B_button.innerHTML = upgrade_B_text;
 // Button is disabled at start.
 upgrade_B_button.disabled = true;
 
-let upgrade_B_count : number = 0;
+let upgrade_B_count: number = 0;
 //TODO: Round to nearist hundredth
 upgrade_B_button.onclick = () => {
   if (total_turtles >= upgrade_B_cost) {
-    // Rescuing negative turtles "spends" them on an
-    // upgrade.
-    rescueTurtle(-upgrade_B_cost);
-    // Upgrade the amount of turtles rescued every second
-    rescue_per_auto += upgrade_B_profit;
-    // Increment the number of upgrades
     upgrade_B_count += 1;
-    // Update text for growth and upgrades
-    update_upgrade_text();
+    // Cost is assigned to the new price calculated in the upgrade function
+    upgrade_B_cost = buy_upgrade(upgrade_B_cost, upgrade_B_profit)
+    // Update text after price increase
+    upgrade_B_button.innerHTML = `C: (Cost ${upgrade_B_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_B_profit.toFixed(PRECISION)}/sec)`;
   }
 };
-
 // Upgrade C (cost 1000, profit 50.0/sec)
-const upgrade_C_cost: number = 1000;
+let upgrade_C_cost: number = 1000;
 const upgrade_C_profit: number = 50.0;
 const upgrade_C_button = document.createElement("button");
-const upgrade_C_text =
-  `C: (Cost ${upgrade_C_cost}. Growth Rate: ${upgrade_C_profit}/sec)`;
+const upgrade_C_text = `C: (Cost ${upgrade_C_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_C_profit.toFixed(PRECISION)}/sec)`;
 upgrade_C_button.innerHTML = upgrade_C_text;
 // Button is disabled at start.
 upgrade_C_button.disabled = true;
 
-let upgrade_C_count : number = 0;
+let upgrade_C_count: number = 0;
 //TODO: Round to nearist hundredth
 upgrade_C_button.onclick = () => {
   if (total_turtles >= upgrade_C_cost) {
-    // Rescuing negative turtles "spends" them on an
-    // upgrade.
-    rescueTurtle(-upgrade_C_cost);
-    // Upgrade the amount of turtles rescued every second
-    rescue_per_auto += upgrade_C_profit;
-    // Increment the number of upgrades
     upgrade_C_count += 1;
-    // Update text for growth and upgrades
-    update_upgrade_text();
+    // Cost is assigned to the new price calculated in the upgrade function
+    upgrade_C_cost = buy_upgrade(upgrade_C_cost, upgrade_C_profit)
+    // Update text after price increase
+    upgrade_C_button.innerHTML = `C: (Cost ${upgrade_C_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_C_profit.toFixed(PRECISION)}/sec)`;
   }
 };
+
+// General function used to buy upgrades, returns the new price of the upgrade
+function buy_upgrade(cost : number, profit : number) : number{
+    // Rescuing negative turtles "spends" them on an
+    // upgrade.
+    rescueTurtle(-cost);
+    // Upgrade the amount of turtles rescued every second
+    rescue_per_auto += profit;
+
+    // Update text for growth and upgrades
+    update_upgrade_text();
+
+    // Return new cost after price increase.
+    return cost * PRICE_INCREASE
+}
 
 // TODO: Put upgrade buttons in an array, to disable/enable them.
 // OR maybe an event listener?
@@ -139,7 +149,7 @@ upgrade_C_button.onclick = () => {
 // What upgrades the player has, needs to be updated when purchases are made.
 const upgrade_list = document.createElement("div");
 
-// The growth rate of automatic turtles being rescued. 
+// The growth rate of automatic turtles being rescued.
 const growth_rate_text = document.createElement("div");
 
 // Set the text to be the default values.
@@ -171,20 +181,16 @@ function rescueTurtle(turts_to_rescue: number) {
   } else if (upgrade_C_button.disabled) {
     upgrade_C_button.disabled = false;
   }
-  main_amount_label.innerHTML = `${total_turtles} turtles rescued.`;
+  main_amount_label.innerHTML = `${total_turtles.toFixed(PRECISION)} turtles rescued.`;
 }
 
-
-
-
-function update_upgrade_text()
-{
-    growth_rate_text.innerHTML = `Currently rescuing ${rescue_per_auto} turtles per second.`;
-    upgrade_list.innerHTML = `A: ${upgrade_A_count}, B: ${upgrade_B_count}, C: ${upgrade_C_count}`; 
+function update_upgrade_text() {
+  growth_rate_text.innerHTML = `Currently rescuing ${rescue_per_auto.toFixed(PRECISION)} turtles per second.`;
+  upgrade_list.innerHTML = `A: ${upgrade_A_count.toFixed(PRECISION)}, B: ${upgrade_B_count.toFixed(PRECISION)}, C: ${upgrade_C_count.toFixed(PRECISION)}`;
 }
 
 function appendToApp() {
-    //TODO: Put all of this into one array and then append in a loop for cleaner code.
+  //TODO: Put all of this into one array and then append in a loop for cleaner code.
   app.append(header);
   app.append(main_amount_label);
   app.append(main_button);
