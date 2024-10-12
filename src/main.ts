@@ -12,12 +12,18 @@ document.title = gameName;
 const PRECISION = 2
 
 // MAIN BUTTON SETUP
+const MAIN_BUTTON_WIDTH : string = '300px'
+const MAIN_BUTTON_HEIGHT : string = '175px'
+const MAIN_BUTTON_FONT_SIZE : string = '60px'
 const main_button = document.createElement("button");
+main_button.style.width = MAIN_BUTTON_WIDTH;
+main_button.style.height = MAIN_BUTTON_HEIGHT;
+main_button.style.fontSize = MAIN_BUTTON_FONT_SIZE; 
 const main_text = "🐢";
 main_button.innerHTML = main_text;
 const main_amount_label = document.createElement("div");
 let total_turtles: number = 0;
-main_amount_label.innerHTML = `${total_turtles} turtles rescued.`;
+main_amount_label.innerHTML = `${total_turtles} turtles rescued from deadly seagulls.`;
 
 // Changing this later to allow for upgrades.
 const rescue_per_click: number = 1;
@@ -55,7 +61,7 @@ main_button.onclick = () => {
 // Makes the spacing look correct on the webpage.
 const main_auto_button_separator = document.createElement("div");
 main_auto_button_separator.innerHTML =
-  "Press the turtle button above to rescue turtles!";
+  "Press the turtle button above to rescue baby turtles from the seagull onslaught!";
 
 
 
@@ -66,11 +72,12 @@ main_auto_button_separator.innerHTML =
 const PRICE_INCREASE : number = 1.15
 
 
-// Upgrade A (cost 10, profit 0.1/sec)
+// Upgrade A (cost 10, profit 0.1 turtles/sec)
 let upgrade_A_cost: number = 10;
 const upgrade_A_profit: number = 0.1;
 const upgrade_A_button = document.createElement("button");
-const upgrade_A_text = `A: (Cost ${upgrade_A_cost}. Growth Rate: ${upgrade_A_profit}/sec)`;
+upgrade_A_button.name = "squads"
+const upgrade_A_text = `Train baby turtles into rescue squads: (Cost ${upgrade_A_cost}. Growth Rate: ${upgrade_A_profit} turtles/sec)`;
 upgrade_A_button.innerHTML = upgrade_A_text;
 // Button is disabled at start.
 upgrade_A_button.disabled = true;
@@ -83,15 +90,16 @@ upgrade_A_button.onclick = () => {
     // Cost is assigned to the new price calculated in the upgrade function
     upgrade_A_cost = buy_upgrade(upgrade_A_cost, upgrade_A_profit)
     // Update text after price increase
-    upgrade_A_button.innerHTML = `C: (Cost ${upgrade_A_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_A_profit.toFixed(PRECISION)}/sec)`;
+    upgrade_A_button.innerHTML = `Train baby turtles into rescue squads: (Cost ${upgrade_A_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_A_profit.toFixed(PRECISION)} turtles/sec)`;
   }
 };
 
-// Upgrade B (cost 100, profit 2.0/sec)
+// Upgrade B (cost 100, profit 2.0 turtles/sec)
 let upgrade_B_cost: number = 100;
 const upgrade_B_profit: number = 2.0;
 const upgrade_B_button = document.createElement("button");
-const upgrade_B_text = `B: (Cost ${upgrade_B_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_B_profit.toFixed(PRECISION)}/sec)`;
+upgrade_B_button.name = "classes"
+const upgrade_B_text = `Train baby turtles in battle tactics, to uncover more about the seagull's strategies: (Cost ${upgrade_B_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_B_profit.toFixed(PRECISION)} turtles/sec)`;
 upgrade_B_button.innerHTML = upgrade_B_text;
 // Button is disabled at start.
 upgrade_B_button.disabled = true;
@@ -104,14 +112,15 @@ upgrade_B_button.onclick = () => {
     // Cost is assigned to the new price calculated in the upgrade function
     upgrade_B_cost = buy_upgrade(upgrade_B_cost, upgrade_B_profit)
     // Update text after price increase
-    upgrade_B_button.innerHTML = `C: (Cost ${upgrade_B_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_B_profit.toFixed(PRECISION)}/sec)`;
+    upgrade_B_button.innerHTML = `Train baby turtles in battle tactics, to uncover more about the seagull's strategies: (Cost ${upgrade_B_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_B_profit.toFixed(PRECISION)} turtles/sec)`;
   }
 };
-// Upgrade C (cost 1000, profit 50.0/sec)
+// Upgrade C (cost 1000, profit 50.0 turtles/sec)
 let upgrade_C_cost: number = 1000;
 const upgrade_C_profit: number = 50.0;
 const upgrade_C_button = document.createElement("button");
-const upgrade_C_text = `C: (Cost ${upgrade_C_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_C_profit.toFixed(PRECISION)}/sec)`;
+upgrade_C_button.name = "labs"
+const upgrade_C_text = `Research and develop aerial anti-seagull technology: (Cost ${upgrade_C_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_C_profit.toFixed(PRECISION)} turtles/sec)`;
 upgrade_C_button.innerHTML = upgrade_C_text;
 // Button is disabled at start.
 upgrade_C_button.disabled = true;
@@ -124,7 +133,7 @@ upgrade_C_button.onclick = () => {
     // Cost is assigned to the new price calculated in the upgrade function
     upgrade_C_cost = buy_upgrade(upgrade_C_cost, upgrade_C_profit)
     // Update text after price increase
-    upgrade_C_button.innerHTML = `C: (Cost ${upgrade_C_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_C_profit.toFixed(PRECISION)}/sec)`;
+    upgrade_C_button.innerHTML = `Research and develop aerial anti-seagull technology: (Cost ${upgrade_C_cost.toFixed(PRECISION)}. Growth Rate: ${upgrade_C_profit.toFixed(PRECISION)} turtles/sec)`;
   }
 };
 
@@ -181,12 +190,12 @@ function rescueTurtle(turts_to_rescue: number) {
   } else if (upgrade_C_button.disabled) {
     upgrade_C_button.disabled = false;
   }
-  main_amount_label.innerHTML = `${total_turtles.toFixed(PRECISION)} turtles rescued.`;
+  main_amount_label.innerHTML = `${total_turtles.toFixed(PRECISION)} turtles rescued from deadly seagulls.`;
 }
 
 function update_upgrade_text() {
   growth_rate_text.innerHTML = `Currently rescuing ${rescue_per_auto.toFixed(PRECISION)} turtles per second.`;
-  upgrade_list.innerHTML = `A: ${upgrade_A_count.toFixed(PRECISION)}, B: ${upgrade_B_count.toFixed(PRECISION)}, C: ${upgrade_C_count.toFixed(PRECISION)}`;
+  upgrade_list.innerHTML = `Rescue squads: ${upgrade_A_count.toFixed(PRECISION)}, Strategy classes in session: ${upgrade_B_count.toFixed(PRECISION)}, Anti-seagull laboratories built: ${upgrade_C_count.toFixed(PRECISION)}`;
 }
 
 function appendToApp() {
