@@ -1,4 +1,4 @@
-// Found the toPrecision() function on mdn web docs when looking at the Number methods
+// Found the toFixed() function on mdn web docs when looking at the Number methods
 import "./style.css";
 
 const app: HTMLDivElement = document.querySelector("#app")!;
@@ -16,12 +16,40 @@ interface Item {
 }
 
 const availableItems: Item[] = [
-  { name: "squads", cost: 10, rate: 0.1, description: "When fighting in a group, the turtles are surprisingly coordinated."},
-  { name: "classes", cost: 100, rate: 2 , description: "By expanding strategic options, the turtles can better know their enemy."},
-  { name: "labs", cost: 1000, rate: 50 , description: "The skies will no longer be a safe haven for the bird menace!"},
-  { name: "cyborg", cost: 50000, rate: 200 , description: "CY-Turtle knows no limit."},
-  { name: "W.M.S.D.", cost: 200000, rate: 500 , description: "Weapon of Mass Seagull Destruction, the world collectively shudders."},
-
+  {
+    name: "squads",
+    cost: 10,
+    rate: 0.1,
+    description:
+      "When fighting in a group, the turtles are surprisingly coordinated.",
+  },
+  {
+    name: "classes",
+    cost: 100,
+    rate: 2,
+    description:
+      "By expanding strategic options, the turtles can better know their enemy.",
+  },
+  {
+    name: "labs",
+    cost: 1000,
+    rate: 50,
+    description:
+      "The skies will no longer be a safe haven for the bird menace!",
+  },
+  {
+    name: "cyborg",
+    cost: 50000,
+    rate: 200,
+    description: "CY-Turtle knows no limit.",
+  },
+  {
+    name: "W.M.S.D.",
+    cost: 200000,
+    rate: 500,
+    description:
+      "Weapon of Mass Seagull Destruction, the world collectively shudders.",
+  },
 ];
 
 // What level of rounding is used when displaying numbers
@@ -32,21 +60,21 @@ const ERR_NO: number = -1;
 const PRICE_INCREASE: number = 1.15;
 // Changing this later to allow for upgrades.
 const RESCUE_PER_CLICK: number = 1;
+let total_turtles: number = 0;
 
 // MAIN BUTTON SETUP
+const main_button = document.createElement("button");
 const MAIN_BUTTON_WIDTH: string = "300px";
 const MAIN_BUTTON_HEIGHT: string = "175px";
 const MAIN_BUTTON_FONT_SIZE: string = "60px";
-const main_button = document.createElement("button");
-main_button.onclick = () => {
-  rescueTurtle(RESCUE_PER_CLICK);
-};
 main_button.style.width = MAIN_BUTTON_WIDTH;
 main_button.style.height = MAIN_BUTTON_HEIGHT;
 main_button.style.fontSize = MAIN_BUTTON_FONT_SIZE;
+main_button.onclick = () => {
+  rescueTurtle(RESCUE_PER_CLICK);
+};
 main_button.innerHTML = "🐢";
 const main_amount_label = document.createElement("div");
-let total_turtles: number = 0;
 main_amount_label.innerHTML = `${total_turtles.toFixed(PRECISION)} turtles rescued from deadly seagulls.`;
 // Auto Click----------------------------------------------------
 // Time since last auto-turtle
@@ -88,8 +116,7 @@ function update_upgrade_text() {
   Strategy classes in session: ${getCount("classes").toFixed(PRECISION)}, 
   Anti-seagull laboratories built: ${getCount("labs").toFixed(PRECISION)},
   Cyborg Turtles Active: ${getCount("cyborg").toFixed(PRECISION)}, 
-  Nuclear Options Taken: ${getCount("W.M.S.D.").toFixed(PRECISION)
-  }`;
+  Nuclear Options Taken: ${getCount("W.M.S.D.").toFixed(PRECISION)}`;
 }
 const elements: HTMLElement[] = [
   header,
@@ -158,11 +185,9 @@ function setButtonText(name: string) {
       button.innerHTML = `Train classes of turtles to fight the seagull enemy! (Cost: ${getCost(name).toFixed(PRECISION)})`;
     } else if (name == "labs") {
       button.innerHTML = `Research and develop anti-seagull technology! (Cost: ${getCost(name).toFixed(PRECISION)})`;
-    }
-    else if (name == "cyborg") {
+    } else if (name == "cyborg") {
       button.innerHTML = `Build a Robot Turtle to annihilate the seagull forces! (Cost: ${getCost(name).toFixed(PRECISION)})`;
-    }
-    else if (name == "W.M.S.D.") {
+    } else if (name == "W.M.S.D.") {
       button.innerHTML = `Research nuclear weapon development. (Cost: ${getCost(name).toFixed(PRECISION)})`;
     }
   }
