@@ -51,18 +51,22 @@ const availableItems: Item[] = [
       "Weapon of Mass Seagull Destruction, the world collectively shudders.",
   },
 ];
-
-function rescueTurtle(turts_to_rescue: number) {
-  total_turtles += turts_to_rescue;
+/**
+ * Rescue turtles by incrementing the total count of turtles.
+ * @param {number} turtsToRescue - The amount of turtles to add to the total count of turtles.
+ */
+function rescueTurtle(turtsToRescue: number) {
+  totalTurtles += turtsToRescue;
   for (const item of availableItems) {
-    const button = btn_map.get(item.name);
-    if (total_turtles < item.cost) {
+    const button = btnMap.get(item.name);
+    if (totalTurtles < item.cost) {
+      // If the player cannot afford an upgrade, disable the button.
       if (button) button.disabled = true;
     } else if (button && button.disabled) {
       button.disabled = false;
     }
   }
-  main_amount_label.innerHTML = `${total_turtles.toFixed(PRECISION)} turtles rescued from deadly seagulls.`;
+  mainAmountLabel.innerHTML = `${totalTurtles.toFixed(PRECISION)} turtles rescued from deadly seagulls.`;
 }
 // What level of rounding is used when displaying numbers
 const PRECISION: number = 2;
@@ -70,73 +74,93 @@ const PRECISION: number = 2;
 const ERROR_CODE: number = -1;
 // Every time an item is bought, the price for that item will be multiplied by 1.15
 const PRICE_INCREASE: number = 1.15;
-// Changing this later to allow for upgrades.
+// The amount of turtles rescued when the main button is clicked
 const RESCUE_PER_CLICK: number = 1;
-let total_turtles: number = 0;
+// Sum of all turtles that the player has rescued.
+let totalTurtles: number = 0;
 
 // MAIN BUTTON SETUP
-const main_button = document.createElement("button");
+// This section sets up the main button's functionality and display.
+const mainButton = document.createElement("button");
 const MAIN_BUTTON_WIDTH: string = "300px";
 const MAIN_BUTTON_HEIGHT: string = "175px";
 const MAIN_BUTTON_FONT_SIZE: string = "60px";
-main_button.style.width = MAIN_BUTTON_WIDTH;
-main_button.style.height = MAIN_BUTTON_HEIGHT;
-main_button.style.fontSize = MAIN_BUTTON_FONT_SIZE;
+mainButton.style.width = MAIN_BUTTON_WIDTH;
+mainButton.style.height = MAIN_BUTTON_HEIGHT;
+mainButton.style.fontSize = MAIN_BUTTON_FONT_SIZE;
 
-main_button.onclick = () => {
+mainButton.onclick = () => {
   rescueTurtle(RESCUE_PER_CLICK);
 };
-main_button.innerHTML = "🐢";
-const main_amount_label = document.createElement("div");
-main_amount_label.innerHTML = `${total_turtles.toFixed(PRECISION)} turtles rescued from deadly seagulls.`;
+mainButton.innerHTML = "🐢";
+const mainAmountLabel = document.createElement("div");
+mainAmountLabel.innerHTML = `${totalTurtles.toFixed(PRECISION)} turtles rescued from deadly seagulls.`;
 
 // Auto Click----------------------------------------------------
+// This section sets up automatic rescuing of turtles.
+/**
+ * Each second this function rescues a certain amount of turtles based on the current state of upgrades.
+ * @param {number} timestamp - Passed in when requestAnimationFrame() is called
+ */
 function autoTurtle(timestamp: number) {
-  // Calculates the time in seconds, based off of the time the
-  // last frame finished
-  const time_sec = timestamp / 1000;
+  // Convert to seconds
+  const timeSec = timestamp / 1000;
   // Floor the value, to identify whether or not the code has
   // auto-turtle'd within the last second since the start of the
   // game.
-  if (Math.floor(time_sec) > last_auto_tick) {
+  if (Math.floor(timeSec) > lastAutoTick) {
     // Store the most recent second that the code auto-turtle'd
-    last_auto_tick = Math.floor(time_sec);
-    rescueTurtle(rescue_per_auto);
+    lastAutoTick = Math.floor(timeSec);
+    rescueTurtle(rescuePerAuto);
   }
   requestAnimationFrame(autoTurtle);
 }
 // Time since last auto-turtle
-let last_auto_tick: number = 0;
+let lastAutoTick: number = 0;
 // No auto-click at the start.
-let rescue_per_auto: number = 0;
+let rescuePerAuto: number = 0;
 // Start the auto-click
 requestAnimationFrame(autoTurtle);
 
 // Upgrade State Trackers------------------------------------------
+// This section declares data structures to set up the ability to quickly reference the state of upgrades.
 // brace assist on how to declare a map
-const btn_map = new Map<string, HTMLButtonElement>();
-const count_map = new Map<string, number>();
-const cost_map = new Map<string, number>();
+const btnMap = new Map<string, HTMLButtonElement>();
+const countMap = new Map<string, number>();
+const costMap = new Map<string, number>();
 
+/**
+ * Returns the amount of times a particular Item has been upgraded.
+ * @param {string} name - The 'name' field of the Item whose count is being requested.
+ * @returns {number} - Either the count of upgrades of the requested Item, or the ERROR_CODE if the name was invalid.
+ */
 function getCount(name: string): number {
-  const count = count_map.get(name);
+  const count = countMap.get(name);
   if (count != undefined) {
     return count;
   } else {
     return ERROR_CODE;
   }
 }
+/**
+ * Returns the current cost of a particular Item.
+ * @param {string} name - The 'name' field of the Item whose cost is being requested.
+ * @returns {number} - Either the current cost of the requested Item, or the ERROR_CODE if the name was invalid.
+ */
 function getCost(name: string): number {
-  const cost = cost_map.get(name);
+  const cost = costMap.get(name);
   if (cost != undefined) {
     return cost;
   } else {
     return ERROR_CODE;
   }
 }
-
+/**
+ * Refreshes a button's text to match its current price after an upgrade has been purchased.
+ * @param {string} name - The name of the Item whose button's text we are trying to alter. 
+ */
 function setButtonText(name: string) {
-  const button = btn_map.get(name);
+  const button = btnMap.get(name);
   if (button != undefined) {
     if (name == "squads") {
       button.innerHTML = `Train rescue squads of turtles! (Cost: ${getCost(name).toFixed(PRECISION)})`;
@@ -151,9 +175,12 @@ function setButtonText(name: string) {
     }
   }
 }
-function update_upgrade_text() {
-  growth_rate_text.innerHTML = `Currently rescuing ${rescue_per_auto.toFixed(PRECISION)} turtles per second.`;
-  upgrade_list.innerHTML = `
+/**
+ * Refreshes the display of upgrades after an upgrade has been purchased to reflect the current state.
+ */
+function updateUpgradeText() {
+  growthRateText.innerHTML = `Currently rescuing ${rescuePerAuto.toFixed(PRECISION)} turtles per second.`;
+  upgradeList.innerHTML = `
   Rescue squads: ${getCount("squads").toFixed(PRECISION)}, 
   Strategy classes in session: ${getCount("classes").toFixed(PRECISION)}, 
   Anti-seagull laboratories built: ${getCount("labs").toFixed(PRECISION)},
@@ -162,21 +189,22 @@ function update_upgrade_text() {
 }
 
 // Finalize Layouts---------------------------------------------------
+// This section adds all of the elements to the page, and finalizes the display.
 // Makes the spacing look correct on the webpage.
-const main_auto_button_separator = document.createElement("div");
-main_auto_button_separator.innerHTML =
+const mainAutoButtonSeparator = document.createElement("div");
+mainAutoButtonSeparator.innerHTML =
   "Press the turtle button above to rescue baby turtles from the seagull onslaught!";
 // What upgrades the player has, needs to be updated when purchases are made.
-const upgrade_list = document.createElement("div");
+const upgradeList = document.createElement("div");
 // The growth rate of automatic turtles being rescued.
-const growth_rate_text = document.createElement("div");
+const growthRateText = document.createElement("div");
 const elements: HTMLElement[] = [
   header,
-  main_amount_label,
-  main_button,
-  main_auto_button_separator,
-  growth_rate_text,
-  upgrade_list,
+  mainAmountLabel,
+  mainButton,
+  mainAutoButtonSeparator,
+  growthRateText,
+  upgradeList,
 ];
 for (const element of elements) {
   if (element != undefined) {
@@ -185,24 +213,25 @@ for (const element of elements) {
 }
 
 // Upgrade Layout--------------------------------------------------------
+// This section initializes all of the upgrade's behavior and adds their buttons to the page.
 for (const item of availableItems) {
-  count_map.set(item.name, 0);
-  cost_map.set(item.name, item.cost);
+  countMap.set(item.name, 0);
+  costMap.set(item.name, item.cost);
   const button = document.createElement("button");
-  btn_map.set(item.name, button);
+  btnMap.set(item.name, button);
   // brace helped with the "title" property
   button.title = item.description;
   button.name = item.name;
   button.disabled = true;
   button.onclick = () => {
-    if (total_turtles >= item.cost) {
-      const count = count_map.get(item.name);
-      if (count != undefined) count_map.set(item.name, count + 1);
+    if (totalTurtles >= item.cost) {
+      const count = countMap.get(item.name);
+      if (count != undefined) countMap.set(item.name, count + 1);
       rescueTurtle(-item.cost);
-      rescue_per_auto += item.rate;
-      update_upgrade_text();
+      rescuePerAuto += item.rate;
+      updateUpgradeText();
       item.cost *= PRICE_INCREASE;
-      cost_map.set(item.name, item.cost);
+      costMap.set(item.name, item.cost);
       setButtonText(item.name);
     }
   };
@@ -210,4 +239,4 @@ for (const item of availableItems) {
   app.append(button);
 }
 // Set the text to be the default values.
-update_upgrade_text();
+updateUpgradeText();
