@@ -52,10 +52,22 @@ const availableItems: Item[] = [
   },
 ];
 
+function rescueTurtle(turts_to_rescue: number) {
+  total_turtles += turts_to_rescue;
+  for (const item of availableItems) {
+    const button = btn_map.get(item.name);
+    if (total_turtles < item.cost) {
+      if (button) button.disabled = true;
+    } else if (button && button.disabled) {
+      button.disabled = false;
+    }
+  }
+  main_amount_label.innerHTML = `${total_turtles.toFixed(PRECISION)} turtles rescued from deadly seagulls.`;
+}
 // What level of rounding is used when displaying numbers
 const PRECISION: number = 2;
 // When functions would normally return an undefined, I use this as a way of showing that instead
-const ERR_NO: number = -1;
+const ERROR_CODE: number = -1;
 // Every time an item is bought, the price for that item will be multiplied by 1.15
 const PRICE_INCREASE: number = 1.15;
 // Changing this later to allow for upgrades.
@@ -70,13 +82,29 @@ const MAIN_BUTTON_FONT_SIZE: string = "60px";
 main_button.style.width = MAIN_BUTTON_WIDTH;
 main_button.style.height = MAIN_BUTTON_HEIGHT;
 main_button.style.fontSize = MAIN_BUTTON_FONT_SIZE;
+
 main_button.onclick = () => {
   rescueTurtle(RESCUE_PER_CLICK);
 };
 main_button.innerHTML = "🐢";
 const main_amount_label = document.createElement("div");
 main_amount_label.innerHTML = `${total_turtles.toFixed(PRECISION)} turtles rescued from deadly seagulls.`;
+
 // Auto Click----------------------------------------------------
+function autoTurtle(timestamp: number) {
+  // Calculates the time in seconds, based off of the time the
+  // last frame finished
+  const time_sec = timestamp / 1000;
+  // Floor the value, to identify whether or not the code has
+  // auto-turtle'd within the last second since the start of the
+  // game.
+  if (Math.floor(time_sec) > last_auto_tick) {
+    // Store the most recent second that the code auto-turtle'd
+    last_auto_tick = Math.floor(time_sec);
+    rescueTurtle(rescue_per_auto);
+  }
+  requestAnimationFrame(autoTurtle);
+}
 // Time since last auto-turtle
 let last_auto_tick: number = 0;
 // No auto-click at the start.
@@ -84,31 +112,45 @@ let rescue_per_auto: number = 0;
 // Start the auto-click
 requestAnimationFrame(autoTurtle);
 
-function autoTurtle(timestamp: number) {
-  // Calculates the time in seconds, based off of the time the
-  // last frame finished
-  const time_sec = timestamp / 1000;
+// Upgrade State Trackers------------------------------------------
+// brace assist on how to declare a map
+const btn_map = new Map<string, HTMLButtonElement>();
+const count_map = new Map<string, number>();
+const cost_map = new Map<string, number>();
 
-  // Floor the value, to identify whether or not the code has
-  // auto-turtle'd within the last second since the start of the
-  // game.
-  if (Math.floor(time_sec) > last_auto_tick) {
-    // Store the most recent second that the code auto-turtle'd
-    last_auto_tick = Math.floor(time_sec);
-
-    rescueTurtle(rescue_per_auto);
+function getCount(name: string): number {
+  const count = count_map.get(name);
+  if (count != undefined) {
+    return count;
+  } else {
+    return ERROR_CODE;
   }
-  requestAnimationFrame(autoTurtle);
+}
+function getCost(name: string): number {
+  const cost = cost_map.get(name);
+  if (cost != undefined) {
+    return cost;
+  } else {
+    return ERROR_CODE;
+  }
 }
 
-// Makes the spacing look correct on the webpage.
-const main_auto_button_separator = document.createElement("div");
-main_auto_button_separator.innerHTML =
-  "Press the turtle button above to rescue baby turtles from the seagull onslaught!";
-// What upgrades the player has, needs to be updated when purchases are made.
-const upgrade_list = document.createElement("div");
-// The growth rate of automatic turtles being rescued.
-const growth_rate_text = document.createElement("div");
+function setButtonText(name: string) {
+  const button = btn_map.get(name);
+  if (button != undefined) {
+    if (name == "squads") {
+      button.innerHTML = `Train rescue squads of turtles! (Cost: ${getCost(name).toFixed(PRECISION)})`;
+    } else if (name == "classes") {
+      button.innerHTML = `Train classes of turtles to fight the seagull enemy! (Cost: ${getCost(name).toFixed(PRECISION)})`;
+    } else if (name == "labs") {
+      button.innerHTML = `Research and develop anti-seagull technology! (Cost: ${getCost(name).toFixed(PRECISION)})`;
+    } else if (name == "cyborg") {
+      button.innerHTML = `Build a Robot Turtle to annihilate the seagull forces! (Cost: ${getCost(name).toFixed(PRECISION)})`;
+    } else if (name == "W.M.S.D.") {
+      button.innerHTML = `Research nuclear weapon development. (Cost: ${getCost(name).toFixed(PRECISION)})`;
+    }
+  }
+}
 function update_upgrade_text() {
   growth_rate_text.innerHTML = `Currently rescuing ${rescue_per_auto.toFixed(PRECISION)} turtles per second.`;
   upgrade_list.innerHTML = `
@@ -118,6 +160,16 @@ function update_upgrade_text() {
   Cyborg Turtles Active: ${getCount("cyborg").toFixed(PRECISION)}, 
   Nuclear Options Taken: ${getCount("W.M.S.D.").toFixed(PRECISION)}`;
 }
+
+// Finalize Layouts---------------------------------------------------
+// Makes the spacing look correct on the webpage.
+const main_auto_button_separator = document.createElement("div");
+main_auto_button_separator.innerHTML =
+  "Press the turtle button above to rescue baby turtles from the seagull onslaught!";
+// What upgrades the player has, needs to be updated when purchases are made.
+const upgrade_list = document.createElement("div");
+// The growth rate of automatic turtles being rescued.
+const growth_rate_text = document.createElement("div");
 const elements: HTMLElement[] = [
   header,
   main_amount_label,
@@ -131,11 +183,8 @@ for (const element of elements) {
     app.append(element);
   }
 }
-// Upgrades--------------------------------------------------------
-// brace assist on how to declare a map
-const btn_map = new Map<string, HTMLButtonElement>();
-const count_map = new Map<string, number>();
-const cost_map = new Map<string, number>();
+
+// Upgrade Layout--------------------------------------------------------
 for (const item of availableItems) {
   count_map.set(item.name, 0);
   cost_map.set(item.name, item.cost);
@@ -160,50 +209,5 @@ for (const item of availableItems) {
   setButtonText(item.name);
   app.append(button);
 }
-function getCount(name: string): number {
-  const count = count_map.get(name);
-  if (count != undefined) {
-    return count;
-  } else {
-    return ERR_NO;
-  }
-}
-function getCost(name: string): number {
-  const cost = cost_map.get(name);
-  if (cost != undefined) {
-    return cost;
-  } else {
-    return ERR_NO;
-  }
-}
-function setButtonText(name: string) {
-  const button = btn_map.get(name);
-  if (button != undefined) {
-    if (name == "squads") {
-      button.innerHTML = `Train rescue squads of turtles! (Cost: ${getCost(name).toFixed(PRECISION)})`;
-    } else if (name == "classes") {
-      button.innerHTML = `Train classes of turtles to fight the seagull enemy! (Cost: ${getCost(name).toFixed(PRECISION)})`;
-    } else if (name == "labs") {
-      button.innerHTML = `Research and develop anti-seagull technology! (Cost: ${getCost(name).toFixed(PRECISION)})`;
-    } else if (name == "cyborg") {
-      button.innerHTML = `Build a Robot Turtle to annihilate the seagull forces! (Cost: ${getCost(name).toFixed(PRECISION)})`;
-    } else if (name == "W.M.S.D.") {
-      button.innerHTML = `Research nuclear weapon development. (Cost: ${getCost(name).toFixed(PRECISION)})`;
-    }
-  }
-}
 // Set the text to be the default values.
 update_upgrade_text();
-
-function rescueTurtle(turts_to_rescue: number) {
-  total_turtles += turts_to_rescue;
-  for (const item of availableItems) {
-    const button = btn_map.get(item.name);
-    if (total_turtles < item.cost) {
-      if (button) button.disabled = true;
-    } else if (button && button.disabled) {
-      button.disabled = false;
-    }
-  }
-  main_amount_label.innerHTML = `${total_turtles.toFixed(PRECISION)} turtles rescued from deadly seagulls.`;
-}
