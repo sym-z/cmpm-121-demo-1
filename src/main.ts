@@ -66,14 +66,14 @@ function rescueTurtle(turtsToRescue: number) {
       button.disabled = false;
     }
   }
-  mainAmountLabel.innerHTML = `${totalTurtles.toFixed(PRECISION)} turtles rescued from deadly seagulls.`;
+  mainAmountLabel.innerHTML = `${totalTurtles.toFixed(DECIMAL_PRECISION)} turtles rescued from deadly seagulls.`;
 }
 // What level of rounding is used when displaying numbers
-const PRECISION: number = 2;
+const DECIMAL_PRECISION: number = 2;
 // When functions would normally return an undefined, I use this as a way of showing that instead
 const ERROR_CODE: number = -1;
 // Every time an item is bought, the price for that item will be multiplied by 1.15
-const PRICE_INCREASE: number = 1.15;
+const PRICE_INCREASE_RATE: number = 1.15;
 // The amount of turtles rescued when the main button is clicked
 const RESCUE_PER_CLICK: number = 1;
 // Sum of all turtles that the player has rescued.
@@ -94,7 +94,7 @@ mainButton.onclick = () => {
 };
 mainButton.innerHTML = "🐢";
 const mainAmountLabel = document.createElement("div");
-mainAmountLabel.innerHTML = `${totalTurtles.toFixed(PRECISION)} turtles rescued from deadly seagulls.`;
+mainAmountLabel.innerHTML = `${totalTurtles.toFixed(DECIMAL_PRECISION)} turtles rescued from deadly seagulls.`;
 
 // Auto Click----------------------------------------------------
 // This section sets up automatic rescuing of turtles.
@@ -155,37 +155,35 @@ function getCost(name: string): number {
     return ERROR_CODE;
   }
 }
+// Got help from Brace on a strategy to clean up my setButtonText function using this data structure and the syntax to use when declaring it.
+const upgradeDescriptions : {[key: string]:string} = {
+  "squads": "Train rescue squads of turtles!",
+  "classes": "Train classes of turtles to fight the seagull enemy!",
+  "labs": "Research and develop anti-seagull technology!",
+  "cyborg": "Build a Robot Turtle to annihilate the seagull forces!",
+  "W.M.S.D.": "Research nuclear weapon development."
+};
 /**
  * Refreshes a button's text to match its current price after an upgrade has been purchased.
- * @param {string} name - The name of the Item whose button's text we are trying to alter. 
+ * @param {string} name - The name of the Item whose button's text we are trying to alter.
  */
 function setButtonText(name: string) {
   const button = btnMap.get(name);
   if (button != undefined) {
-    if (name == "squads") {
-      button.innerHTML = `Train rescue squads of turtles! (Cost: ${getCost(name).toFixed(PRECISION)})`;
-    } else if (name == "classes") {
-      button.innerHTML = `Train classes of turtles to fight the seagull enemy! (Cost: ${getCost(name).toFixed(PRECISION)})`;
-    } else if (name == "labs") {
-      button.innerHTML = `Research and develop anti-seagull technology! (Cost: ${getCost(name).toFixed(PRECISION)})`;
-    } else if (name == "cyborg") {
-      button.innerHTML = `Build a Robot Turtle to annihilate the seagull forces! (Cost: ${getCost(name).toFixed(PRECISION)})`;
-    } else if (name == "W.M.S.D.") {
-      button.innerHTML = `Research nuclear weapon development. (Cost: ${getCost(name).toFixed(PRECISION)})`;
+      button.innerHTML = `${upgradeDescriptions[name]} (Cost: ${getCost(name).toFixed(DECIMAL_PRECISION)})`;
     }
   }
-}
 /**
  * Refreshes the display of upgrades after an upgrade has been purchased to reflect the current state.
  */
 function updateUpgradeText() {
-  growthRateText.innerHTML = `Currently rescuing ${rescuePerAuto.toFixed(PRECISION)} turtles per second.`;
+  growthRateText.innerHTML = `Currently rescuing ${rescuePerAuto.toFixed(DECIMAL_PRECISION)} turtles per second.`;
   upgradeList.innerHTML = `
-  Rescue squads: ${getCount("squads").toFixed(PRECISION)}, 
-  Strategy classes in session: ${getCount("classes").toFixed(PRECISION)}, 
-  Anti-seagull laboratories built: ${getCount("labs").toFixed(PRECISION)},
-  Cyborg Turtles Active: ${getCount("cyborg").toFixed(PRECISION)}, 
-  Nuclear Options Taken: ${getCount("W.M.S.D.").toFixed(PRECISION)}`;
+  Rescue squads: ${getCount("squads").toFixed(DECIMAL_PRECISION)}, 
+  Strategy classes in session: ${getCount("classes").toFixed(DECIMAL_PRECISION)}, 
+  Anti-seagull laboratories built: ${getCount("labs").toFixed(DECIMAL_PRECISION)},
+  Cyborg Turtles Active: ${getCount("cyborg").toFixed(DECIMAL_PRECISION)}, 
+  Nuclear Options Taken: ${getCount("W.M.S.D.").toFixed(DECIMAL_PRECISION)}`;
 }
 
 // Finalize Layouts---------------------------------------------------
@@ -230,7 +228,7 @@ for (const item of availableItems) {
       rescueTurtle(-item.cost);
       rescuePerAuto += item.rate;
       updateUpgradeText();
-      item.cost *= PRICE_INCREASE;
+      item.cost *= PRICE_INCREASE_RATE;
       costMap.set(item.name, item.cost);
       setButtonText(item.name);
     }
