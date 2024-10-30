@@ -13,7 +13,22 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
-
+@keyframes spinny {
+  /* Idea of how to do this was referenced from rozy-dixon's D1 assignment at github.com/rozy-dixon/cmpm-121-demo-1*/
+  0%{
+    transform: rotate(0deg) scale(1);
+  }
+  50%{
+    transform: rotate(0deg) scale(0.5);
+  }
+  75%{
+    transform: rotate(360deg) scale(0.5);
+  }
+  100%{
+    transform: rotate(0deg) scale(1);
+  }
+  
+}
 a {
   font-weight: 500;
   color: #646cff;
@@ -24,6 +39,8 @@ a:hover {
 }
 
 body {
+  /* Idea of how to do this was referenced from Cheristic's D1 assignment at github.com/Cheristic/cmpm-121-demo-1*/
+  background-image: url("./d1-bg.png");
   margin: 0;
   display: flex;
   place-items: center;
@@ -33,7 +50,9 @@ body {
 
 h1 {
   font-size: 3.2em;
-  line-height: 1.1;
+  line-height: 3.9;
+  transition: ease;
+  animation: spinny 8s infinite;
 }
 
 #app {
